@@ -38,6 +38,11 @@ def predict_price(brand, year, kms_driven, fuel, transmission, owner):
     return float(model.predict(sample)[0])
 
 
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok"})
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -65,6 +70,11 @@ def predict():
         return jsonify({"error": str(exc)}), 500
     except Exception as exc:
         return jsonify({"error": f"Prediction failed: {exc}"}), 500
+
+
+# Preload model on cloud servers for faster first prediction
+if os.environ.get("PORT") and os.environ.get("FLASK_DEBUG") != "1":
+    load_model()
 
 
 def find_free_port(start=5050, attempts=20):
