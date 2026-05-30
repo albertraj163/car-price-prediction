@@ -13,7 +13,7 @@ cd ~/Documents/car-price-prediction-main
 ### Step 2 - Browser open pannunga
 Terminal la URL varum, adha copy panni browser la paste pannunga:
 ```
-http://127.0.0.1:5050
+http://192.168.1.20:5554
 ```
 
 ### Step 3 - Form fill pannunga

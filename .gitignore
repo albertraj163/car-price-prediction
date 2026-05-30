@@ -5,3 +5,5 @@ __pycache__/
 venv/
 access.log
 error.log
+tunnel.log
+public_url.txt

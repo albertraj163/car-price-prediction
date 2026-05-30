@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 cd "$(dirname "$0")"
+export PORT="${PORT:-5554}"
 echo ""
 echo "  Car Price Predictor starting..."
 echo ""

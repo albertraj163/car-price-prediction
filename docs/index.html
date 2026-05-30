@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Car Price Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">🚗</span>
+        <div>
+          <h1>Car Price Predictor</h1>
+          <p>Enter car details and get an estimated price instantly</p>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="card form-card">
+        <h2>Car Details</h2>
+        <form id="predict-form">
+          <div class="field">
+            <label for="brand">Brand</label>
+            <select id="brand" name="brand" required>
+              <option value="" disabled selected>Select brand</option>
+              <option value="maruti">Maruti Suzuki</option>
+              <option value="honda">Honda</option>
+              <option value="hyundai">Hyundai</option>
+              <option value="toyota">Toyota</option>
+              <option value="ford">Ford</option>
+              <option value="tata">Tata</option>
+              <option value="mahindra">Mahindra</option>
+              <option value="kia">Kia</option>
+              <option value="volkswagen">Volkswagen</option>
+              <option value="renault">Renault</option>
+              <option value="nissan">Nissan</option>
+              <option value="bmw">BMW</option>
+              <option value="mercedes">Mercedes</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="year">Year</label>
+              <select id="year" name="year" required></select>
+            </div>
+            <div class="field">
+              <label for="kms">Kilometers Driven</label>
+              <input type="number" id="kms" name="kms" min="0" max="500000" step="1000" placeholder="e.g. 50000" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="fuel">Fuel Type</label>
+              <select id="fuel" name="fuel" required>
+                <option value="" disabled selected>Select fuel</option>
+                <option value="petrol">Petrol</option>
+                <option value="diesel">Diesel</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="transmission">Transmission</label>
+              <select id="transmission" name="transmission" required>
+                <option value="" disabled selected>Select type</option>
+                <option value="manual">Manual</option>
+                <option value="automatic">Automatic</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Owner</label>
+            <div class="radio-group">
+              <label class="radio-pill"><input type="radio" name="owner" value="first" required><span>1st Owner</span></label>
+              <label class="radio-pill"><input type="radio" name="owner" value="second"><span>2nd Owner</span></label>
+              <label class="radio-pill"><input type="radio" name="owner" value="third"><span>3rd Owner</span></label>
+            </div>
+          </div>
+          <button type="submit" class="btn-predict" id="submit-btn">
+            <span class="btn-text">Get Price Estimate</span>
+            <span class="btn-loader hidden"></span>
+          </button>
+        </form>
+      </section>
+      <section class="card result-card" id="result-card">
+        <div class="result-empty" id="result-empty">
+          <div class="result-icon">₹</div>
+          <h3>Your estimate will appear here</h3>
+          <p>Fill in the car details and click predict to see the estimated market price.</p>
+        </div>
+        <div class="result-content hidden" id="result-content">
+          <p class="result-label">Estimated Price</p>
+          <p class="result-price" id="result-price">₹0</p>
+          <div class="result-summary" id="result-summary"></div>
+        </div>
+        <p class="error-msg hidden" id="error-msg"></p>
+      </section>
+    </main>
+    <footer class="footer">
+      <p>Powered by Machine Learning · <a href="https://github.com/albertraj163/car-price-prediction" style="color:#94a3b8">GitHub</a></p>
+    </footer>
+  </div>
+  <script>
+    const API_BASE = "https://albertraj163-car-price-prediction.hf.space";
+    const yearSelect = document.getElementById("year");
+    for (let year = 2025; year >= 2000; year--) {
+      const option = document.createElement("option");
+      option.value = year;
+      option.textContent = year;
+      yearSelect.appendChild(option);
+    }
+    const form = document.getElementById("predict-form");
+    const submitBtn = document.getElementById("submit-btn");
+    const btnText = submitBtn.querySelector(".btn-text");
+    const btnLoader = submitBtn.querySelector(".btn-loader");
+    const resultEmpty = document.getElementById("result-empty");
+    const resultContent = document.getElementById("result-content");
+    const resultPrice = document.getElementById("result-price");
+    const resultSummary = document.getElementById("result-summary");
+    const errorMsg = document.getElementById("error-msg");
+    function formatPrice(value) { return "₹" + Math.round(value).toLocaleString("en-IN"); }
+    function setLoading(isLoading) {
+      submitBtn.disabled = isLoading;
+      btnText.classList.toggle("hidden", isLoading);
+      btnLoader.classList.toggle("hidden", !isLoading);
+    }
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      setLoading(true);
+      errorMsg.classList.add("hidden");
+      resultEmpty.classList.add("hidden");
+      resultContent.classList.add("hidden");
+      const owner = form.querySelector('input[name="owner"]:checked');
+      const payload = {
+        brand: form.brand.value, year: form.year.value, kms: form.kms.value,
+        fuel: form.fuel.value, transmission: form.transmission.value,
+        owner: owner ? owner.value : "",
+      };
+      try {
+        const response = await fetch(`${API_BASE}/predict`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Something went wrong");
+        resultPrice.textContent = formatPrice(data.price);
+        resultSummary.textContent =
+          `${payload.brand.charAt(0).toUpperCase() + payload.brand.slice(1)} ${payload.year} · ` +
+          `${Number(payload.kms).toLocaleString("en-IN")} km · ${payload.fuel} · ${payload.transmission}`;
+        resultContent.classList.remove("hidden");
+      } catch (error) {
+        errorMsg.textContent = error.message;
+        errorMsg.classList.remove("hidden");
+        resultEmpty.classList.remove("hidden");
+      } finally {
+        setLoading(false);
+      }
+    });
+  </script>
+</body>
+</html>

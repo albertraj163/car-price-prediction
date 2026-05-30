@@ -16,8 +16,8 @@ pip install -r requirements.txt
 ```
 
 ### Open pannunga
-- Same computer: **http://127.0.0.1:5050**
-- Same WiFi phone/laptop: **http://YOUR_IP:5050** (terminal la IP show aagum)
+- Open: **http://192.168.1.20:5554** (server 192 IP)
+- Same WiFi phone/laptop: same URL use pannunga
 
 ### Stop / Check
 ```bash

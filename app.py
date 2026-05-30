@@ -5,11 +5,37 @@ from pathlib import Path
 import joblib
 import pandas as pd
 from flask import Flask, jsonify, render_template, request
+from flask_cors import CORS
 
 MODEL_PATH = Path(__file__).parent / "car_price_model.joblib"
 CURRENT_YEAR = 2025
+DEFAULT_PORT = 5554
+
+
+def get_server_ip():
+    try:
+        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
+            ip = info[4][0]
+            if ip.startswith("192."):
+                return ip
+    except OSError:
+        pass
+
+    probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        probe.connect(("192.168.1.1", 1))
+        ip = probe.getsockname()[0]
+        if ip.startswith("192."):
+            return ip
+    except OSError:
+        pass
+    finally:
+        probe.close()
+
+    return socket.gethostbyname(socket.gethostname())
 
 app = Flask(__name__)
+CORS(app)
 pipeline = None
 
 
@@ -77,7 +103,7 @@ if os.environ.get("PORT") and os.environ.get("FLASK_DEBUG") != "1":
     load_model()
 
 
-def find_free_port(start=5050, attempts=20):
+def find_free_port(start=DEFAULT_PORT, attempts=20):
     for port in range(start, start + attempts):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             try:
@@ -90,9 +116,10 @@ def find_free_port(start=5050, attempts=20):
 
 if __name__ == "__main__":
     load_model()
-    preferred = int(os.environ.get("PORT", 5050))
+    preferred = int(os.environ.get("PORT", DEFAULT_PORT))
     port = find_free_port(preferred)
     if port != preferred:
         print(f"Port {preferred} is busy, using port {port} instead.")
-    print(f"Open in browser: http://127.0.0.1:{port}")
+    server_ip = get_server_ip()
+    print(f"Open in browser: http://{server_ip}:{port}")
     app.run(debug=True, host="0.0.0.0", port=port, use_reloader=False)

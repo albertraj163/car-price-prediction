@@ -1,57 +1,43 @@
 # Car Price Predictor
 
-Predict used car prices using a Random Forest machine learning model with a clean web UI.
+Predict used car prices using Machine Learning.
+
+## Links
+
+| | URL |
+|---|---|
+| **Open App** | **https://albertraj163.github.io/car-price-prediction/** |
+| GitHub Repo | https://github.com/albertraj163/car-price-prediction |
+| Live API | https://albertraj163-car-price-prediction.hf.space |
 
 ## Features
 
-- Train ML model from car dataset
-- Predict price via CLI or web interface
-- HTML/CSS UI with brand, year, kms, fuel, transmission, and owner inputs
-- **100% free** — run on your own computer or PythonAnywhere (no Render)
+- Web UI — brand, year, kms, fuel, transmission, owner
+- Random Forest ML model
+- Free hosting via GitHub Pages + Hugging Face
 
-## Quick Start — Own Server (Free)
+## Run Locally
 
 ```bash
 pip install -r requirements.txt
-./run_server.sh
+./run_public.sh    # public internet link
+./run_server.sh    # LAN only (192.168.x:5554)
 ```
 
-Open: **http://127.0.0.1:5050**
+## Deploy Live Link (one time)
 
 ```bash
-./stop_server.sh      # stop server
-./status_server.sh    # check if running
+./deploy_hf.sh
 ```
 
-## Live Website — PythonAnywhere (Free, Always Online)
+GitHub Pages auto-deploys on every push to `main`.
 
-No Render. Full free cloud hosting: [DEPLOY.md](DEPLOY.md)
-
-## Local Development
-
-```bash
-./start.sh
-```
-
-## CLI Prediction
+## CLI
 
 ```bash
 python3 predict.py --brand maruti --year 2014 --kms 50000 --fuel petrol --transmission manual --owner first
 ```
 
-## Project Structure
-
-| File | Description |
-|------|-------------|
-| `run_server.sh` | Start app in background (free, own server) |
-| `stop_server.sh` | Stop background server |
-| `wsgi.py` | PythonAnywhere config |
-| `train_model.py` | Train and save the model |
-| `predict.py` | Command-line prediction |
-| `app.py` | Flask web server |
-| `templates/index.html` | Web UI |
-| `static/style.css` | UI styling |
-
 ## Tech Stack
 
-- Python, scikit-learn, pandas, Flask, gunicorn
+Python · Flask · scikit-learn · GitHub Pages · Hugging Face Spaces
