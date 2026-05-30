@@ -1,31 +1,30 @@
 #!/usr/bin/env bash
-# Deploy app to Hugging Face Spaces (free live link for GitHub Pages)
+# Deploy app to Hugging Face Spaces (free — GitHub Pages predict ku backend)
 
 set -e
-export PATH="$HOME/.local/bin:$PATH"
 SPACE="albertraj163/car-price-prediction"
 
 pip install -q huggingface_hub
 
-if ! huggingface-cli whoami >/dev/null 2>&1; then
-  echo "Hugging Face login required (free):"
-  echo "  1. https://huggingface.co/join — account create"
-  echo "  2. https://huggingface.co/settings/tokens — token create"
-  echo "  3. Run: huggingface-cli login"
+if ! hf auth whoami >/dev/null 2>&1; then
+  echo ""
+  echo "Hugging Face login (free, one time):"
+  echo "  1. https://huggingface.co/join"
+  echo "  2. https://huggingface.co/settings/tokens → New token"
+  echo "  3. Run: hf auth login"
+  echo ""
   exit 1
 fi
 
-huggingface-cli repo create car-price-prediction --type space --space_sdk docker 2>/dev/null || true
+hf repo create "$SPACE" --type space --space_sdk docker 2>/dev/null || true
 
 git remote remove huggingface 2>/dev/null || true
 git remote add huggingface "https://huggingface.co/spaces/$SPACE"
 
-echo "Pushing to Hugging Face Space..."
+echo "Uploading to Hugging Face..."
 git push huggingface main --force
 
 echo ""
-echo "Live app (GitHub Pages backend):"
-echo "  https://albertraj163-car-price-prediction.hf.space"
-echo ""
-echo "GitHub Pages (after deploy):"
-echo "  https://albertraj163.github.io/car-price-prediction/"
+echo "Done! Links:"
+echo "  GitHub Pages: https://albertraj163.github.io/car-price-prediction/"
+echo "  Live API:     https://albertraj163-car-price-prediction.hf.space"
