@@ -7,32 +7,11 @@ import pandas as pd
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 
+from config import HOST, PORT
+from utils import get_server_ip
+
 MODEL_PATH = Path(__file__).parent / "car_price_model.joblib"
 CURRENT_YEAR = 2025
-DEFAULT_PORT = 5554
-
-
-def get_server_ip():
-    try:
-        for info in socket.getaddrinfo(socket.gethostname(), None, socket.AF_INET):
-            ip = info[4][0]
-            if ip.startswith("192."):
-                return ip
-    except OSError:
-        pass
-
-    probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        probe.connect(("192.168.1.1", 1))
-        ip = probe.getsockname()[0]
-        if ip.startswith("192."):
-            return ip
-    except OSError:
-        pass
-    finally:
-        probe.close()
-
-    return socket.gethostbyname(socket.gethostname())
 
 app = Flask(__name__)
 CORS(app)
@@ -98,28 +77,10 @@ def predict():
         return jsonify({"error": f"Prediction failed: {exc}"}), 500
 
 
-# Preload model on cloud servers for faster first prediction
-if os.environ.get("PORT") and os.environ.get("FLASK_DEBUG") != "1":
-    load_model()
-
-
-def find_free_port(start=DEFAULT_PORT, attempts=20):
-    for port in range(start, start + attempts):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            try:
-                sock.bind(("0.0.0.0", port))
-                return port
-            except OSError:
-                continue
-    raise RuntimeError(f"No free port found between {start} and {start + attempts - 1}")
-
-
 if __name__ == "__main__":
     load_model()
-    preferred = int(os.environ.get("PORT", DEFAULT_PORT))
-    port = find_free_port(preferred)
-    if port != preferred:
-        print(f"Port {preferred} is busy, using port {port} instead.")
+    port = int(os.environ.get("PORT", PORT))
     server_ip = get_server_ip()
-    print(f"Open in browser: http://{server_ip}:{port}")
-    app.run(debug=True, host="0.0.0.0", port=port, use_reloader=False)
+    url = f"http://{server_ip}:{port}"
+    print(f"Open in browser: {url}")
+    app.run(debug=True, host=HOST, port=port, use_reloader=False)

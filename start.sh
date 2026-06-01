@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 cd "$(dirname "$0")"
-export PORT="${PORT:-5554}"
-echo ""
-echo "  Car Price Predictor starting..."
-echo ""
+source "$(dirname "$0")/server_env.sh"
 
 if [ ! -f "car_price_model.joblib" ]; then
-  echo "  Model not found. Training first (one time only)..."
+  echo "Training model (first time only)..."
   python3 train_model.py
-  echo ""
 fi
 
 python3 app.py
