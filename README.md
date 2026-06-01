@@ -1,34 +1,37 @@
 # Car Price Predictor
 
-Predict used car prices using Machine Learning.
+Predict used car prices using Machine Learning — localhost maari full-a work aagum.
 
 ## Open App
 
-```
-http://192.168.1.20:5554
-```
+### http://192.168.1.20:5554
+
+Form fill panni **Get Price Estimate** click pannunga — price varum.
 
 ## Start Server
 
 ```bash
+cd ~/Documents/car-price-prediction-main
 pip install -r requirements.txt
 ./run_server.sh
 ```
 
-Browser la open pannunga: **http://192.168.1.20:5554**
-
-Same WiFi phone/laptop la same link use pannunga.
+Terminal la link show aagum. Browser la open pannunga.
 
 ```bash
+./status_server.sh    # running check
 ./stop_server.sh      # stop
-./status_server.sh    # check status
-./start.sh            # foreground run (development)
+./start.sh            # foreground (development)
 ```
 
-## GitHub Repo
+## Settings
+
+| Setting | Value |
+|---------|-------|
+| Port | `5554` → change in `config.py` |
+| IP | `192.168.1.20` (server network IP) |
+| Link | `http://192.168.1.20:5554` |
+
+## GitHub
 
 https://github.com/albertraj163/car-price-prediction
-
-## Port
-
-Default port: **5554** (change in `config.py`)

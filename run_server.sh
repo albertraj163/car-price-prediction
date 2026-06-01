@@ -22,7 +22,7 @@ nohup gunicorn app:app \
 
 echo ""
 echo "  Server running!"
-echo "  Open: http://${SERVER_IP}:${PORT}"
+echo "  Open: ${APP_URL}"
 echo ""
 echo "  Stop:   ./stop_server.sh"
 echo "  Status: ./status_server.sh"
